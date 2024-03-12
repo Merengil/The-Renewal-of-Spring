@@ -2,23 +2,36 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Manages the petal
+/// </summary>
 public class PetalController : MonoBehaviour
 {
+    public GameObject petalGameObject;
     public Transform petal;
     public Transform startPoint;
     public Transform endPoint;
+    public Transform player;
+    public CharacterController playerController;
     public MeshRenderer petalRenderer;
 
+    /// <summary>
+    /// Time to add to the counter (in ms).
+    /// </summary>
+    public int AddedTimeCounter = 3000;
 
     private bool isStartGoal = false;
     private Vector3 target;
     private const float speed = 1f;
 
+    //**********************************************************
 
     // Start is called before the first frame update
-    void Start()
+    /*void Start()
     {
-    }
+    }*/
+
+    //**********************************************************
 
     // Update is called once per frame
     void Update()
@@ -33,6 +46,23 @@ public class PetalController : MonoBehaviour
             isStartGoal = !isStartGoal;
     }
 
+    //**********************************************************
+
+    /// <summary>
+    /// When colliding with the petal, destroy it and add time to the timer
+    /// </summary>
+    /// <param name="other"></param>
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.transform == player)
+        {
+            playerController.IncreaseCounter(AddedTimeCounter);
+            Destroy(petalGameObject);
+        }
+    }
+
+    //**********************************************************
+
     private Vector3 GetCurrentMvtTarget()
     {
         if (isStartGoal)
@@ -40,6 +70,8 @@ public class PetalController : MonoBehaviour
         else
             return endPoint.position;
     }
+
+    //**********************************************************
 
     /// <summary>
     /// Draws a line to show the path of the sakura petal
