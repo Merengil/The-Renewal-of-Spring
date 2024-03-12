@@ -7,8 +7,6 @@ using UnityEngine;
 /// </summary>
 public class PetalController : MonoBehaviour
 {
-    public GameObject petalGameObject;
-    public Transform petal;
     public Transform startPoint;
     public Transform endPoint;
     public Transform player;
@@ -23,13 +21,15 @@ public class PetalController : MonoBehaviour
     private bool isStartGoal = false;
     private Vector3 target;
     private const float speed = 1f;
+    private Transform petal;
 
     //**********************************************************
 
     // Start is called before the first frame update
-    /*void Start()
+    void Start()
     {
-    }*/
+        petal = transform.GetChild(0).GetComponent<Transform>();
+    }
 
     //**********************************************************
 
@@ -57,7 +57,7 @@ public class PetalController : MonoBehaviour
         if (other.transform == player)
         {
             playerController.IncreaseCounter(AddedTimeCounter);
-            Destroy(petalGameObject);
+            Destroy(gameObject);
         }
     }
 
