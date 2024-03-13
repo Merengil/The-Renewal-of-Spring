@@ -3,26 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.ShaderGraph;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+    public ParticleSystem particleSystem;
+
     /// <summary>
     /// Sakura timer in ms
     /// </summary>
-    private float sakuraTimer = 0;
+    /// TODO: Put that to 0
+    private float sakuraTimer = 30;
     private bool isSakuraTime = false;
-    private PlayerControls controls;
-
-    /// <summary>
-    /// Called on initialization
-    /// </summary>
-    private void Awake()
-    {
-        controls = new PlayerControls();
-        controls.Player.Fire.performed += ctx => ActivatePetals();
-
-    }
 
     //**********************************************************
 
@@ -36,6 +27,15 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (sakuraTimer > 0 && Input.GetButton("Fire1"))
+            this.ActivatePetals();
+        else if (isSakuraTime)
+        {
+            isSakuraTime = false;
+            var em = particleSystem.emission;
+            em.enabled = false;
+        }
+
     }
 
     //**********************************************************
@@ -57,31 +57,34 @@ public class PlayerController : MonoBehaviour
     private void ActivatePetals()
     {
         Debug.Log("Button Pressed");
-        if (sakuraTimer > 0)
+        sakuraTimer = Math.Max(sakuraTimer - Time.deltaTime, 0);
+        if (!isSakuraTime)
+            ActivateSakuraPower();
+        if (sakuraTimer <= 0)
         {
-            sakuraTimer = Math.Max(sakuraTimer - Time.deltaTime, 0);
-            isSakuraTime = true;
-            if (sakuraTimer <= 0)
-            {
-                isSakuraTime = false;
-                sakuraTimer = 0;
-            }
+            DeactivateSakuraPower();
+            sakuraTimer = 0;
         }
     }
 
     //**********************************************************
 
-    private void OnEnable()
+    private void ActivateSakuraPower()
     {
-        controls.Player.Enable();
+        var em = particleSystem.emission;
+        em.enabled = true;
+        isSakuraTime = true;
     }
 
     //**********************************************************
 
-    private void OnDisable()
+    private void DeactivateSakuraPower()
     {
-        controls.Player.Disable();
+        var em = particleSystem.emission;
+        em.enabled = false;
+        isSakuraTime = false;
     }
+
 
     //**********************************************************
 
