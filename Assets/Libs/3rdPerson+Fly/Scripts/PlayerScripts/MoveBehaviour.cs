@@ -10,13 +10,15 @@ public class MoveBehaviour : GenericBehaviour
 	public float speedDampTime = 0.1f;              // Default damp time to change the animations based on current speed.
 	public string jumpButton = "Jump";              // Default jump button.
 	public float jumpHeight = 1.5f;                 // Default jump height.
-	public float jumpInertialForce = 10f;          // Default horizontal inertial force when jumping.
+    public float jumpInertialForce = 10f;          // Default horizontal inertial force when jumping and sprinting.
+    public float jumpRunInertialForce = 20f;          // Default horizontal inertial force when jumping and running.
 
-	private float speed, speedSeeker;               // Moving speed.
+    private float speed, speedSeeker;               // Moving speed.
 	private int jumpBool;                           // Animator variable related to jumping.
 	private int groundedBool;                       // Animator variable related to whether or not the player is on ground.
 	private bool jump;                              // Boolean to determine whether or not the player started a jump.
 	private bool isColliding;                       // Boolean to determine if the player has collided with an obstacle.
+	private float jumpSpeed;
 
 	// Start is always called after any Awake functions.
 	void Start()
@@ -61,27 +63,43 @@ public class MoveBehaviour : GenericBehaviour
 			// Set jump related parameters.
 			behaviourManager.LockTempBehaviour(this.behaviourCode);
 			behaviourManager.GetAnim.SetBool(jumpBool, true);
+
+			/* I changed this part of the code.
+			 * 
+			 * Original code made it impossible to jump while standing still, due to that "if" condition.
+			 * Instead, I'll just change the speed depending on the current state of the character.
+			*/
 			// Is a locomotion jump?
-			if (behaviourManager.GetAnim.GetFloat(speedFloat) > 0.1)
-			{
-				// Temporarily change player friction to pass through obstacles.
-				GetComponent<CapsuleCollider>().material.dynamicFriction = 0f;
-				GetComponent<CapsuleCollider>().material.staticFriction = 0f;
-				// Remove vertical velocity to avoid "super jumps" on slope ends.
-				RemoveVerticalVelocity();
-				// Set jump vertical impulse velocity.
-				float velocity = 2f * Mathf.Abs(Physics.gravity.y) * jumpHeight;
-				velocity = Mathf.Sqrt(velocity);
-				behaviourManager.GetRigidBody.AddForce(Vector3.up * velocity, ForceMode.VelocityChange);
-			}
-		}
+			//if (behaviourManager.GetAnim.GetFloat(speedFloat) > 0.1)
+			
+			// Temporarily change player friction to pass through obstacles.
+			GetComponent<CapsuleCollider>().material.dynamicFriction = 0f;
+			GetComponent<CapsuleCollider>().material.staticFriction = 0f;
+			// Remove vertical velocity to avoid "super jumps" on slope ends.
+			RemoveVerticalVelocity();
+			// Set jump vertical impulse velocity.
+			float velocity = 2f * Mathf.Abs(Physics.gravity.y) * jumpHeight;
+			velocity = Mathf.Sqrt(velocity);
+			behaviourManager.GetRigidBody.AddForce(Vector3.up * velocity, ForceMode.VelocityChange);
+
+			// Remember the current state of the character.
+			if (behaviourManager.GetAnim.GetFloat(speedFloat) <= 0.1)
+				jumpSpeed = 0;
+			else if (behaviourManager.IsSprinting())
+				jumpSpeed = sprintSpeed * jumpInertialForce;
+			else
+				jumpSpeed = runSpeed * jumpRunInertialForce;
+
+
+        }
 		// Is already jumping?
 		else if (behaviourManager.GetAnim.GetBool(jumpBool))
 		{
 			// Keep forward movement while in the air.
 			if (!behaviourManager.IsGrounded() && !isColliding && behaviourManager.GetTempLockStatus())
-			{
-				behaviourManager.GetRigidBody.AddForce(transform.forward * (jumpInertialForce * Physics.gravity.magnitude * sprintSpeed), ForceMode.Acceleration);
+			{                
+                behaviourManager.GetRigidBody.AddForce(transform.forward * (Physics.gravity.magnitude * jumpSpeed), ForceMode.Acceleration);
+                //behaviourManager.GetRigidBody.AddForce(transform.forward * (jumpInertialForce * Physics.gravity.magnitude * sprintSpeed), ForceMode.Acceleration);
 			}
 			// Has landed?
 			if ((behaviourManager.GetRigidBody.velocity.y < 0) && behaviourManager.IsGrounded())

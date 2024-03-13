@@ -9,19 +9,24 @@ public class PetalController : MonoBehaviour
 {
     public Transform startPoint;
     public Transform endPoint;
-    public Transform player;
-    public CharacterController playerController;
     public MeshRenderer petalRenderer;
+    public GameObject player;
 
     /// <summary>
-    /// Time to add to the counter (in ms).
+    /// Time to add to the counter (in s).
     /// </summary>
-    public int AddedTimeCounter = 3000;
+    public float AddedTimeCounter = 3;
 
     private bool isStartGoal = false;
     private Vector3 target;
     private const float speed = 1f;
     private Transform petal;
+
+    /// <summary>
+    /// A static variable pointing at the player controller.
+    /// If null it'll be initialized.
+    /// </summary>
+    static private PlayerController playerController = null;
 
     //**********************************************************
 
@@ -54,9 +59,9 @@ public class PetalController : MonoBehaviour
     /// <param name="other"></param>
     void OnTriggerEnter(Collider other)
     {
-        if (other.transform == player)
+        if (other.transform == player.transform)
         {
-            playerController.IncreaseCounter(AddedTimeCounter);
+            GetPlayerController().IncreaseCounter(AddedTimeCounter);
             Destroy(gameObject);
         }
     }
@@ -83,5 +88,18 @@ public class PetalController : MonoBehaviour
             Gizmos.DrawLine(petal.transform.position, startPoint.position);
             Gizmos.DrawLine(petal.transform.position, endPoint.position);
         }
+    }
+
+    //**********************************************************
+
+    /// <summary>
+    /// Method that keeps a constant reference to the player controller.
+    /// </summary>
+    /// <returns></returns>
+    private PlayerController GetPlayerController()
+    {
+        if (playerController == null)
+            playerController = player.GetComponent<PlayerController>();
+        return playerController;
     }
 }
