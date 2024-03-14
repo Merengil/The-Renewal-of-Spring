@@ -4,23 +4,25 @@ using System.Collections.Generic;
 using UnityEditor.ShaderGraph;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, ISakuraSubject
 {
-    public ParticleSystem particleSystem;
+    public ParticleSystem[] particleSystemPetal;
 
     /// <summary>
-    /// Sakura timer in ms
+    /// Sakura timer in s
     /// </summary>
-    /// TODO: Put that to 0
-    private float sakuraTimer = 30;
+    private float sakuraTimer = 0;
     private bool isSakuraTime = false;
+    private List<ISakuraObserver> _observers = new();
+    private SakuraObserverObject sakuraObject = new();
 
     //**********************************************************
 
     // Start is called before the first frame update
-    /*void Start()
+    void Start()
     {
-    }*/
+        Notify();
+    }
 
     //**********************************************************
 
@@ -28,12 +30,10 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         if (sakuraTimer > 0 && Input.GetButton("Fire1"))
-            this.ActivatePetals();
+            this.KeepSakuraTimeOn();
         else if (isSakuraTime)
         {
-            isSakuraTime = false;
-            var em = particleSystem.emission;
-            em.enabled = false;
+            DeactivateSakuraTime();
         }
 
     }
@@ -47,6 +47,7 @@ public class PlayerController : MonoBehaviour
     internal void IncreaseCounter(float addedTimeCounter)
     {
         sakuraTimer += addedTimeCounter;
+        Notify();
     }
 
     //**********************************************************
@@ -54,39 +55,71 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// Activates Sakura time on button press
     /// </summary>
-    private void ActivatePetals()
+    private void KeepSakuraTimeOn()
     {
         Debug.Log("Button Pressed");
         sakuraTimer = Math.Max(sakuraTimer - Time.deltaTime, 0);
         if (!isSakuraTime)
-            ActivateSakuraPower();
+            ActivateSakuraTime();
         if (sakuraTimer <= 0)
         {
-            DeactivateSakuraPower();
+            DeactivateSakuraTime();
             sakuraTimer = 0;
         }
+        Notify();
     }
 
     //**********************************************************
 
-    private void ActivateSakuraPower()
+    private void ActivateSakuraTime()
     {
-        var em = particleSystem.emission;
-        em.enabled = true;
+        foreach(var particle in particleSystemPetal)
+        {
+            var em = particle.emission;
+            em.enabled = true;
+        }
         isSakuraTime = true;
     }
 
     //**********************************************************
 
-    private void DeactivateSakuraPower()
+    private void DeactivateSakuraTime()
     {
-        var em = particleSystem.emission;
-        em.enabled = false;
+        foreach (var particle in particleSystemPetal)
+        {
+            var em = particle.emission;
+            em.enabled = false;
+        }
         isSakuraTime = false;
     }
-
 
     //**********************************************************
 
     public float GetSakuraTimer() { return sakuraTimer; }
+
+    //**********************************************************
+
+    // Attach an observer to the subject.
+    public void Attach(ISakuraObserver observer)
+    {
+        this._observers.Add(observer);
+    }
+
+    //**********************************************************
+
+    // Detach an observer from the subject.
+    public void Detach(ISakuraObserver observer)
+    {
+        this._observers.Remove(observer);
+    }
+
+    //**********************************************************
+
+    // Notify all observers about an event.
+    public void Notify()
+    {
+        sakuraObject.SakuraTime = this.sakuraTimer;
+        foreach (var observer in _observers)
+            observer.SakuraUpdate(sakuraObject);
+    }
 }
