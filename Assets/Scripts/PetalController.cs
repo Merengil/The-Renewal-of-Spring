@@ -102,4 +102,11 @@ public class PetalController : MonoBehaviour
             playerController = player.GetComponent<PlayerController>();
         return playerController;
     }
+
+    //**********************************************************
+
+    public void SetPlayer(GameObject playerCopy)
+    {
+        this.player = playerCopy;
+    }
 }
