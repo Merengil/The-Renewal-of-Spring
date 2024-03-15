@@ -57,7 +57,6 @@ public class PlayerController : MonoBehaviour, ISakuraSubject
     /// </summary>
     private void KeepSakuraTimeOn()
     {
-        Debug.Log("Button Pressed");
         sakuraTimer = Math.Max(sakuraTimer - Time.deltaTime, 0);
         if (!isSakuraTime)
             ActivateSakuraTime();
@@ -92,6 +91,13 @@ public class PlayerController : MonoBehaviour, ISakuraSubject
         }
         isSakuraTime = false;
     }
+
+    //**********************************************************
+
+    /// <summary>
+    /// Getter for isSakuraTime.
+    /// </summary>
+    public bool IsSakuraTime { get { return isSakuraTime; } }
 
     //**********************************************************
 
