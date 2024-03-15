@@ -12,7 +12,7 @@ public class TerrainController : MonoBehaviour
     public Terrain terrain;
     public int InitialNumberOfPetals = 5000;
     public int InitialNumberOfTrees = 100;
-    
+
     private Vector3 tempvect = new();
     private GameObject newObj;
 
@@ -60,13 +60,5 @@ public class TerrainController : MonoBehaviour
             if (isPetal)
                 newObj.GetComponent<PetalController>().SetPlayer(player);
         }
-    }
-
-    //**********************************************************
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

@@ -17,6 +17,7 @@ public class SakuraAoEController : MonoBehaviour
 
     private PlayerController pc;
     private string treeName;
+    private 
 
     //**********************************************************
 
@@ -29,13 +30,24 @@ public class SakuraAoEController : MonoBehaviour
 
     //**********************************************************
 
+    private void Update()
+    {
+        if (Input.GetButtonDown("Fire1"))
+        {
+            Collider[] colliders = Physics.OverlapSphere(this.transform.position, 5);
+            foreach (Collider collider in colliders)
+                if (collider.gameObject.name.StartsWith(treeName))
+                    BloomTree(collider);
+        }
+    }
+
+    //**********************************************************
+
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(treeName + " " + other.gameObject.name);
+        //Debug.Log(treeName + " " + other.gameObject.name);
         if (pc.IsSakuraTime && other.gameObject.name.StartsWith(treeName))
-        {
             BloomTree(other);
-        }
     }
 
     //**********************************************************
