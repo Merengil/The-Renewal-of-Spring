@@ -8,11 +8,13 @@ public class TerrainController : MonoBehaviour
 {
     public GameObject petal;
     public GameObject player;
+    public GameObject tree;
     public Terrain terrain;
     public int InitialNumberOfPetals = 5000;
+    public int InitialNumberOfTrees = 100;
     
     private Vector3 tempvect = new();
-    private GameObject newPetal;
+    private GameObject newObj;
 
     //**********************************************************
 
@@ -20,15 +22,21 @@ public class TerrainController : MonoBehaviour
     void Start()
     {
         terrain = GetComponent<Terrain>();
-        GenerateRandomPetalsObjects(InitialNumberOfPetals);
+        GenerateRandomObjects(petal, InitialNumberOfPetals, true);
+        GenerateRandomObjects(tree, InitialNumberOfTrees, false);
     }
 
     //**********************************************************
 
-    private void GenerateRandomPetalsObjects(int numberPetals)
+    /// <summary>
+    /// Populate a map with a gameObject
+    /// </summary>
+    /// <param name="gameObj">Reference to the gameobject to populate the map with</param>
+    /// <param name="numberObjects">Number of objects to populate the map with</param>
+    private void GenerateRandomObjects(GameObject gameObj, int numberObjects, bool isPetal)
     {
         Vector3 terrainSize = terrain.terrainData.size;
-        for (int i = 0; i < numberPetals; i++) {
+        for (int i = 0; i < numberObjects; i++) {
             // Random coordinates on Terrain
             tempvect.x = (float)Math.Truncate(UnityEngine.Random.Range(0, terrainSize.x));
             tempvect.y = 0;
@@ -38,13 +46,19 @@ public class TerrainController : MonoBehaviour
             tempvect = terrain.transform.TransformPoint(tempvect);
 
             // Getting height
-            tempvect.y = terrain.SampleHeight(tempvect) + 0.5f;
+            tempvect.y = terrain.SampleHeight(tempvect);
+            if (isPetal)
+                tempvect.y += +0.5f;
 
             // Instanciating the petal
-            newPetal = GameObject.Instantiate(petal,
+            newObj = GameObject.Instantiate(gameObj,
                 tempvect,
                 Quaternion.identity);
-            newPetal.GetComponent<PetalController>().SetPlayer(player);
+
+            // Not enough time to do this in a clean way, that will have to be fixed
+            // one day...
+            if (isPetal)
+                newObj.GetComponent<PetalController>().SetPlayer(player);
         }
     }
 

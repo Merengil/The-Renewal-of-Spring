@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Interface displaying sakura time
+/// Interface displaying sakura time. Fires an event whenever 
+/// the sakura timer changes.
+/// Useful for the sakura timer.
 /// </summary>
 public interface ISakuraSubject
 {
