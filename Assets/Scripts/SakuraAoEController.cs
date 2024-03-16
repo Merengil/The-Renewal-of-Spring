@@ -32,7 +32,7 @@ public class SakuraAoEController : MonoBehaviour, IBloomingTreeSubject
 
     private void Update()
     {
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetButtonDown("Fire1") && pc.HasSakuraPowerLeft)
         {
             Collider[] colliders = Physics.OverlapSphere(this.transform.position, 5);
             foreach (Collider collider in colliders)

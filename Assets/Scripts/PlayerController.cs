@@ -101,6 +101,13 @@ public class PlayerController : MonoBehaviour, ISakuraSubject
 
     //**********************************************************
 
+    /// <summary>
+    /// Returns whether Sakura time can be activated or not.
+    /// </summary>
+    public bool HasSakuraPowerLeft { get { return (sakuraTimer > 0); } }
+
+    //**********************************************************
+
     public float GetSakuraTimer() { return sakuraTimer; }
 
     //**********************************************************
