@@ -8,7 +8,7 @@ using UnityEngine;
 /// <summary>
 /// Manage collision between the AoE and trees, to trigger blooming.
 /// </summary>
-public class SakuraAoEController : MonoBehaviour
+public class SakuraAoEController : MonoBehaviour, IBloomingTreeSubject
 {
     public GameObject player;
     public GameObject tree;
@@ -17,7 +17,7 @@ public class SakuraAoEController : MonoBehaviour
 
     private PlayerController pc;
     private string treeName;
-    private 
+    private List<IBloomingTreeObserver> observers = new();
 
     //**********************************************************
 
@@ -92,6 +92,11 @@ public class SakuraAoEController : MonoBehaviour
 
                     // Update the LODs array in the LODGroup component
                     originalLODGroup.SetLODs(originalLODs);
+
+                    // Removes the original object
+                    GameObject.Destroy(otherTree.gameObject);
+
+                    NotifyBloomingTree();
                 }
                 else
                 {
@@ -107,5 +112,27 @@ public class SakuraAoEController : MonoBehaviour
         {
             Debug.LogError("LODGroup component or new FBX instance not found.");
         }
+    }
+
+    //**********************************************************
+
+    public void Attach(IBloomingTreeObserver observer)
+    {
+        observers.Add(observer);
+    }
+
+    //**********************************************************
+
+    public void Detach(IBloomingTreeObserver observer)
+    {
+        observers.Remove(observer);
+    }
+
+    //**********************************************************
+
+    public void NotifyBloomingTree()
+    {
+        foreach (IBloomingTreeObserver observer in observers)
+            observer.BloomingTreeUpdate();
     }
 }
