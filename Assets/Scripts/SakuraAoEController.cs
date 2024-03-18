@@ -13,7 +13,7 @@ public class SakuraAoEController : MonoBehaviour, IBloomingTreeSubject
     public GameObject player;
     public GameObject tree;
     public GameObject bloomingTree; // Reference to the new FBX prefab with LODs
-
+    public GameObject sakuraBurst;
 
     private PlayerController pc;
     private string treeName;
@@ -54,6 +54,13 @@ public class SakuraAoEController : MonoBehaviour, IBloomingTreeSubject
 
     private void BloomTree(Collider otherTree)
     {
+        // Instantiate a sakura burst on the tree
+        GameObject newFBXInstance2 = Instantiate(sakuraBurst,
+            otherTree.transform.position + new Vector3(-0.5f, 4, 0),
+            otherTree.transform.rotation);
+
+        // Wait 1s
+        StartCoroutine(Wait1s());
 
         // Instantiate the new FBX prefab
         GameObject newFBXInstance = Instantiate(bloomingTree,
@@ -112,6 +119,18 @@ public class SakuraAoEController : MonoBehaviour, IBloomingTreeSubject
         {
             Debug.LogError("LODGroup component or new FBX instance not found.");
         }
+    }
+
+    //**********************************************************
+
+    /// <summary>
+    /// Wait 1s
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator Wait1s()
+    {
+        // Wait for 1 second
+        yield return new WaitForSeconds(1);
     }
 
     //**********************************************************
