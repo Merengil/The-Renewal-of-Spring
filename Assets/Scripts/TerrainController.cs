@@ -9,9 +9,11 @@ public class TerrainController : MonoBehaviour
     public GameObject petal;
     public GameObject player;
     public GameObject tree;
+    public GameObject flower;
     public Terrain terrain;
     public int InitialNumberOfPetals = 5000;
     public int InitialNumberOfTrees = 100;
+    public int InitialNumberOfFlowers = 1000;
 
     private Vector3 tempvect = new();
     private GameObject newObj;
@@ -24,6 +26,7 @@ public class TerrainController : MonoBehaviour
         terrain = GetComponent<Terrain>();
         GenerateRandomObjects(petal, InitialNumberOfPetals, true);
         GenerateRandomObjects(tree, InitialNumberOfTrees, false);
+        GenerateRandomObjects(flower, InitialNumberOfTrees, false);
     }
 
     //**********************************************************
@@ -48,7 +51,7 @@ public class TerrainController : MonoBehaviour
             // Getting height
             tempvect.y = terrain.SampleHeight(tempvect);
             if (isPetal)
-                tempvect.y += +0.5f;
+                tempvect.y += 1;
 
             // Instanciating the petal
             newObj = GameObject.Instantiate(gameObj,
