@@ -63,10 +63,10 @@ public class BlossomingTreeController : MonoBehaviour
                 for (int k = 0; k < materials.Length; k++)
                 {
                     // Check if the material has a transparency property
-                    //if (materials[k].HasProperty("_Mode"))
+                    if (materials[k].HasProperty("_Mode"))
                     {
                         // Set the rendering mode to transparent
-                        //materials[k].SetFloat("_Mode", 2); // 2 represents the value for "Transparent" mode
+                        materials[k].SetFloat("_Mode", 2); // 2 represents the value for "Transparent" mode
 
                         // Set the alpha value directly
                         Color color = materials[k].color;
@@ -74,15 +74,15 @@ public class BlossomingTreeController : MonoBehaviour
                         materials[k].color = color;
 
                         // Apply the changes
-                        /*materials[k].SetFloat("_Mode", 3); // 3 represents the value for "Transparent" mode with shadows
+                        materials[k].SetFloat("_Mode", 3); // 3 represents the value for "Transparent" mode with shadows
                         materials[k].EnableKeyword("_ALPHABLEND_ON");
                         materials[k].EnableKeyword("_ALPHAPREMULTIPLY_ON");
-                        materials[k].renderQueue = 3000;*/
+                        materials[k].renderQueue = 3000;
                     }
-                    //else
+                    /*else
                     {
-                        //Debug.LogWarning("Material does not have a transparency property.");
-                    }
+                        Debug.LogWarning("Material does not have a transparency property.");
+                    }*/
                 }
             }
         }

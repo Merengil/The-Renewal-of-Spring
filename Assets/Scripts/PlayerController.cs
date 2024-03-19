@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.ShaderGraph;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour, ISakuraSubject
@@ -13,7 +12,7 @@ public class PlayerController : MonoBehaviour, ISakuraSubject
     /// </summary>
     private float sakuraTimer = 0;
     private bool isSakuraTime = false;
-    private List<ISakuraObserver> _observers = new();
+    private readonly List<ISakuraObserver> _observers = new();
     private SakuraObserverObject sakuraObject = new();
 
     //**********************************************************

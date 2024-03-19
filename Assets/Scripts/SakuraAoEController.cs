@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TreeEditor;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -17,7 +16,7 @@ public class SakuraAoEController : MonoBehaviour, IBloomingTreeSubject
 
     private PlayerController pc;
     private string treeName;
-    private List<IBloomingTreeObserver> observers = new();
+    private readonly List<IBloomingTreeObserver> observers = new();
 
     //**********************************************************
 
@@ -55,12 +54,25 @@ public class SakuraAoEController : MonoBehaviour, IBloomingTreeSubject
     private void BloomTree(Collider otherTree)
     {
         // Instantiate a sakura burst on the tree
-        GameObject newFBXInstance2 = Instantiate(sakuraBurst,
-            otherTree.transform.position + new Vector3(-0.5f, 4, 0),
+        Instantiate(sakuraBurst,
+            otherTree.transform.position,// + new Vector3(-0.5f, 4, 0),
             otherTree.transform.rotation);
 
         // Wait 1s
-        StartCoroutine(Wait1s());
+        StartCoroutine(WaitAndCreateTree(otherTree));
+
+    }
+
+    //**********************************************************
+
+    /// <summary>
+    /// as the name says
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator WaitAndCreateTree(Collider otherTree)
+    {
+        // Wait for 1 second
+        yield return new WaitForSeconds(0.5f);
 
         // Instantiate the new FBX prefab
         GameObject newFBXInstance = Instantiate(bloomingTree,
@@ -119,18 +131,6 @@ public class SakuraAoEController : MonoBehaviour, IBloomingTreeSubject
         {
             Debug.LogError("LODGroup component or new FBX instance not found.");
         }
-    }
-
-    //**********************************************************
-
-    /// <summary>
-    /// Wait 1s
-    /// </summary>
-    /// <returns></returns>
-    IEnumerator Wait1s()
-    {
-        // Wait for 1 second
-        yield return new WaitForSeconds(1);
     }
 
     //**********************************************************
