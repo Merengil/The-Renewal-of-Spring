@@ -24,6 +24,10 @@ public class EndGameController : MonoBehaviour
     {
         if (isCountdownFinished)
         {
+            // quit game on escape
+            if (Input.GetKey(KeyCode.Escape))
+                Application.Quit();
+
             // On any keypress, go back to the menu
             if (Input.anyKey)
                 SceneManager.LoadScene(0);

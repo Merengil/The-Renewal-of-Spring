@@ -10,6 +10,11 @@ public class StartButtonController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // quit game on escape
+        if (Input.GetKey(KeyCode.Escape))
+            Application.Quit();
+
+        // start game
         if (Input.GetButton("Fire1"))
             OnButtonClick();
     }
