@@ -53,14 +53,19 @@ public class SakuraAoEController : MonoBehaviour, IBloomingTreeSubject
 
     private void BloomTree(Collider otherTree)
     {
-        // Instantiate a sakura burst on the tree
-        Instantiate(sakuraBurst,
-            otherTree.transform.position,// + new Vector3(-0.5f, 4, 0),
-            otherTree.transform.rotation);
+        if (otherTree != null && otherTree.gameObject != null)
+        {
+            // Instantiate a sakura burst on the tree
+            Instantiate(sakuraBurst,
+                otherTree.transform.position,// + new Vector3(-0.5f, 4, 0),
+                otherTree.transform.rotation);
 
-        // Wait 1s
-        StartCoroutine(WaitAndCreateTree(otherTree));
+            // Wait 1s
+            lock(otherTree)
+                StartCoroutine(WaitAndCreateTree(otherTree));
 
+
+        }
     }
 
     //**********************************************************
@@ -71,65 +76,71 @@ public class SakuraAoEController : MonoBehaviour, IBloomingTreeSubject
     /// <returns></returns>
     IEnumerator WaitAndCreateTree(Collider otherTree)
     {
-        // Wait for 1 second
-        yield return new WaitForSeconds(0.5f);
 
-        // Instantiate the new FBX prefab
-        GameObject newFBXInstance = Instantiate(bloomingTree,
-            otherTree.transform.position,
-            otherTree.transform.rotation);
-
-        // Get the LODGroup component of the original GameObject
-        LODGroup originalLODGroup = otherTree.GetComponent<LODGroup>();
-
-        if (originalLODGroup != null && newFBXInstance != null)
+        if (otherTree != null 
+            && otherTree.transform != null
+            && otherTree.gameObject != null)
         {
-            // Get the LODs array from the LODGroup component
-            LOD[] originalLODs = originalLODGroup.GetLODs();
+            // Wait for 1 second
+            yield return new WaitForSeconds(0.5f);
 
-            if (originalLODs.Length > 0)
+            // Instantiate the new FBX prefab
+            GameObject newFBXInstance = Instantiate(bloomingTree,
+                otherTree.transform.position,
+                otherTree.transform.rotation);
+
+            // Get the LODGroup component of the original GameObject
+            LODGroup originalLODGroup = otherTree.GetComponent<LODGroup>();
+
+            if (originalLODGroup != null && newFBXInstance != null)
             {
-                // Get the mesh filter of the new FBX instance
-                MeshFilter newMeshFilter = newFBXInstance.GetComponentInChildren<MeshFilter>();
+                // Get the LODs array from the LODGroup component
+                LOD[] originalLODs = originalLODGroup.GetLODs();
 
-                if (newMeshFilter != null)
+                if (originalLODs.Length > 0)
                 {
-                    // Set the replacement mesh for the LODs
-                    for (int i = 0; i < originalLODs.Length; i++)
+                    // Get the mesh filter of the new FBX instance
+                    MeshFilter newMeshFilter = newFBXInstance.GetComponentInChildren<MeshFilter>();
+
+                    if (newMeshFilter != null)
                     {
-                        // Accessing the mesh filter of the renderer
-                        MeshFilter rendererMeshFilter = originalLODs[i].renderers[0].GetComponent<MeshFilter>();
-                        if (rendererMeshFilter != null)
+                        // Set the replacement mesh for the LODs
+                        for (int i = 0; i < originalLODs.Length; i++)
                         {
-                            rendererMeshFilter.sharedMesh = newMeshFilter.sharedMesh;
+                            // Accessing the mesh filter of the renderer
+                            MeshFilter rendererMeshFilter = originalLODs[i].renderers[0].GetComponent<MeshFilter>();
+                            if (rendererMeshFilter != null)
+                            {
+                                rendererMeshFilter.sharedMesh = newMeshFilter.sharedMesh;
+                            }
+                            else
+                            {
+                                Debug.LogError("MeshFilter not found in the renderer.");
+                            }
                         }
-                        else
-                        {
-                            Debug.LogError("MeshFilter not found in the renderer.");
-                        }
+
+                        // Update the LODs array in the LODGroup component
+                        originalLODGroup.SetLODs(originalLODs);
+
+                        // Removes the original object
+                        GameObject.Destroy(otherTree.gameObject);
+
+                        NotifyBloomingTree();
                     }
-
-                    // Update the LODs array in the LODGroup component
-                    originalLODGroup.SetLODs(originalLODs);
-
-                    // Removes the original object
-                    GameObject.Destroy(otherTree.gameObject);
-
-                    NotifyBloomingTree();
+                    else
+                    {
+                        Debug.LogError("MeshFilter not found in the new FBX instance.");
+                    }
                 }
                 else
                 {
-                    Debug.LogError("MeshFilter not found in the new FBX instance.");
+                    Debug.LogError("No LODs found in the original GameObject.");
                 }
             }
             else
             {
-                Debug.LogError("No LODs found in the original GameObject.");
+                Debug.LogError("LODGroup component or new FBX instance not found.");
             }
-        }
-        else
-        {
-            Debug.LogError("LODGroup component or new FBX instance not found.");
         }
     }
 
