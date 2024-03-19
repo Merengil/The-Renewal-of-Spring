@@ -28,6 +28,10 @@ public class PlayerController : MonoBehaviour, ISakuraSubject
     // Update is called once per frame
     void Update()
     {
+        // quit game on escape
+        if (Input.GetKey(KeyCode.Escape))
+            Application.Quit();
+
         if (sakuraTimer > 0 && Input.GetButton("Fire1"))
             this.KeepSakuraTimeOn();
         else if (isSakuraTime)
